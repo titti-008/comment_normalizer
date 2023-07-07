@@ -20,14 +20,14 @@ func TestParse(t *testing.T) {
 			opts:    &Options{},
 		},
 		{
-			name:    "one newline comment with default symbol",
+			name:    "one newline comment with hash symbol",
 			input:   `# one line ruby comment.`,
 			want:    "one line ruby comment.",
 			wantErr: false,
 			opts:    &Options{symbol: SYMBOL_HASH},
 		},
 		{
-			name: "default newline",
+			name: "Separated single line comment with hash symbol",
 			input: `
 # This
 # is
@@ -39,7 +39,7 @@ func TestParse(t *testing.T) {
 			opts:    &Options{symbol: SYMBOL_HASH},
 		},
 		{
-			name: "default newline",
+			name: "Separated single line comment with slash symbol",
 			input: `
 // This
 // is
@@ -51,18 +51,30 @@ func TestParse(t *testing.T) {
 			opts:    &Options{symbol: SYMBOL_SLASH},
 		},
 		{
-			name:    "default newline",
+			name:    "Separated by CRLF",
 			input:   "\r\n// This\r\n// is\r\n// a\r\n// comment.\r\n",
 			want:    `This is a comment.`,
 			wantErr: false,
 			opts:    &Options{newline: CRLF},
 		},
 		{
-			name:    "default newline",
+			name:    "Separated by CR",
 			input:   "\r// This\r// is\r// a\r// comment.\r",
 			want:    `This is a comment.`,
 			wantErr: false,
 			opts:    &Options{newline: CR},
+		},
+		{
+			name: "many tab and space in front of comment",
+			input: `
+					// This
+					// is
+					// a
+					// comment.
+					`,
+			want:    `This is a comment.`,
+			wantErr: false,
+			opts:    &Options{},
 		},
 		// 		{
 		// 			name: "default newline",

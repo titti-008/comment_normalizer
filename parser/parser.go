@@ -2,6 +2,7 @@ package parser
 
 import (
 	"strings"
+	"unicode"
 )
 
 const (
@@ -32,6 +33,19 @@ type Options struct {
 	symbol  symbol
 }
 
+func (n newline) String() string {
+	switch n {
+	case CR:
+		return "\r"
+	case CRLF:
+		return "\r\n"
+	case LF:
+		return "\n"
+	default:
+		return "\n"
+	}
+}
+
 func New(input string, opts *Options) *Parser {
 	if opts.symbol == "" {
 		opts.symbol = SYMBOL_DEFAULT
@@ -43,11 +57,25 @@ func New(input string, opts *Options) *Parser {
 }
 
 func (p *Parser) Parse() (string, error) {
-	result := p.replaceCommentSymbol(p.input)
+	result := p.trimLeadingSpacesTabs(p.input)
+	result = p.replaceCommentSymbol(result)
 	result = strings.TrimSpace(result)
 	result = p.replaceNewLine(result)
 
 	return result, nil
+}
+
+func (p *Parser) trimLeadingSpacesTabs(input string) string {
+	lines := strings.Split(input, p.options.newline.String())
+	result := ""
+	for _, line := range lines {
+		line = strings.TrimLeftFunc(line, func(r rune) bool {
+			return unicode.IsSpace(r) && (r == ' ' || r == '\t')
+		})
+		result += line + p.options.newline.String()
+	}
+
+	return result
 }
 
 func (p *Parser) replaceCommentSymbol(input string) string {
