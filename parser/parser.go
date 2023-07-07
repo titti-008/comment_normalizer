@@ -43,12 +43,15 @@ func New(input string, opts *Options) *Parser {
 }
 
 func (p *Parser) Parse() (string, error) {
-	target := string(p.options.symbol)
-	result := strings.Replace(p.input, target, "", -1)
+	result := p.replaceCommentSymbol(p.input)
 	result = strings.TrimSpace(result)
 	result = p.replaceNewLine(result)
 
 	return result, nil
+}
+
+func (p *Parser) replaceCommentSymbol(input string) string {
+	return strings.Replace(input, string(p.options.symbol), "", -1)
 }
 
 func (p *Parser) replaceNewLine(input string) string {
