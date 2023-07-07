@@ -167,6 +167,13 @@ func TestParse(t *testing.T) {
 			wantErr: false,
 			opts:    &Options{join: 3},
 		},
+		{
+			name:    "join sentence specified number of blank line when many line comment has many blank line in between with CRLF",
+			input:   " \t  // This\r\n// is\r\n// first\r\n// comment.\r\n\r\nAnd second line.",
+			want:    "This is first comment.\r\n\r\nAnd second line.",
+			wantErr: false,
+			opts:    &Options{join: 1, newline: CRLF},
+		},
 	}
 
 	for _, tt := range tests {

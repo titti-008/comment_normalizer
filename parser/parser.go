@@ -7,10 +7,10 @@ import (
 
 const (
 	// newline is the default newline character.
-	_    newline = iota
-	CR           // "\r"
-	CRLF         // "\r\n"
-	LF           // "\n"
+	_ newline = iota
+	CR
+	CRLF
+	LF
 )
 
 const (
