@@ -65,13 +65,25 @@ func TestParse(t *testing.T) {
 			opts:    &Options{newline: CR},
 		},
 		{
-			name: "many tab and space in front of comment",
+			name: "many tab in front of comment",
 			input: `
 					// This
 					// is
 					// a
 					// comment.
 					`,
+			want:    `This is a comment.`,
+			wantErr: false,
+			opts:    &Options{},
+		},
+		{
+			name: "many space in front of comment",
+			input: `
+                    // This
+                    // is
+                    // a
+                    // comment.
+                    `,
 			want:    `This is a comment.`,
 			wantErr: false,
 			opts:    &Options{},
