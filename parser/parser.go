@@ -20,6 +20,10 @@ const (
 	SYMBOL_DEFAULT = SYMBOL_SLASH
 )
 
+const (
+	DEFOULT_JOIN = 1
+)
+
 type newline int
 type symbol string
 
@@ -31,6 +35,7 @@ type Parser struct {
 type Options struct {
 	newline newline
 	symbol  symbol
+	join    int
 }
 
 func (n newline) String() string {
@@ -49,6 +54,9 @@ func (n newline) String() string {
 func New(input string, opts *Options) *Parser {
 	if opts.symbol == "" {
 		opts.symbol = SYMBOL_DEFAULT
+	}
+	if opts.join == 0 {
+		opts.join = DEFOULT_JOIN
 	}
 	return &Parser{
 		input:   input,
@@ -69,13 +77,15 @@ func (p *Parser) trimLeadingSpacesTabs(input string) string {
 	lines := strings.Split(input, p.options.newline.String())
 	result := ""
 	for _, line := range lines {
-		line = strings.TrimLeftFunc(line, func(r rune) bool {
-			return unicode.IsSpace(r) && (r == ' ' || r == '\t')
-		})
+		line = strings.TrimLeftFunc(line, isSpaceOrTab)
 		result += line + p.options.newline.String()
 	}
 
 	return result
+}
+
+func isSpaceOrTab(r rune) bool {
+	return unicode.IsSpace(r) && (r == ' ' || r == '\t')
 }
 
 func (p *Parser) replaceCommentSymbol(input string) string {
@@ -83,15 +93,32 @@ func (p *Parser) replaceCommentSymbol(input string) string {
 }
 
 func (p *Parser) replaceNewLine(input string) string {
-	switch p.options.newline {
-	case CR:
-		return strings.Replace(input, "\r", "", -1)
-	case CRLF:
-		return strings.Replace(input, "\r\n", "", -1)
-	case LF:
-		return strings.Replace(input, "\n", "", -1)
-	default:
-		return strings.Replace(input, "\n", "", -1)
+	lines := strings.Split(input, p.options.newline.String())
+
+	result := []string{}
+	sentence := []string{}
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+
+		if line == "" {
+			result = append(result, strings.Join(sentence, " "))
+			if len(sentence) > 0 {
+				result = append(result, p.emptyLine())
+			}
+			sentence = []string{}
+		} else {
+			sentence = append(sentence, line)
+		}
 	}
 
+	result = append(result, strings.Join(sentence, " "))
+	return strings.Join(result, "")
+}
+
+func (p *Parser) emptyLine() string {
+	result := p.options.newline.String()
+	for i := 0; i < p.options.join; i++ {
+		result += p.options.newline.String()
+	}
+	return result
 }

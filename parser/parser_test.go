@@ -88,22 +88,85 @@ func TestParse(t *testing.T) {
 			wantErr: false,
 			opts:    &Options{},
 		},
-		// 		{
-		// 			name: "default newline",
-		// 			input: `
-		// 						# This
-		// 						# is
-		// 						# a
-		// 						# comment.
-		// 						#
-		// 						# and second comment.
-		// 					`,
-		// 			want: `
-		// 		This is a comment.
-		// 		and second comment.`,
-		// 			wantErr: false,
-		// 			opts:    Options{symbol: SYMBOL_HASH},
-		// 		},
+		{
+			name:    "many space in front of comment with CRLF and hash symbol",
+			input:   "\t\t\t# This\r\n\t\t\t# is\r\n\t\t\t# a\r\n\t\t\t# comment.\r\n",
+			want:    `This is a comment.`,
+			wantErr: false,
+			opts:    &Options{newline: CRLF, symbol: SYMBOL_HASH},
+		},
+		{
+			name: "many line comment has blank line in between",
+			input: `
+                    // This
+                    // is
+					// first
+                    // comment.
+					//
+                    // This
+                    // is
+					// second
+                    // comment.
+					//
+                    // This
+                    // is
+					// third
+                    // comment.
+                    `,
+			want:    "This is first comment.\n\nThis is second comment.\n\nThis is third comment.",
+			wantErr: false,
+			opts:    &Options{},
+		},
+		{
+			name: "many line comment has many blank line in between",
+			input: `
+                    // This
+                    // is
+					// first
+                    // comment.
+					//
+					//
+                    // This
+                    // is
+					// second
+                    // comment.
+					//
+					//
+					//
+                    // This
+                    // is
+					// third
+                    // comment.
+                    `,
+			want:    "This is first comment.\n\nThis is second comment.\n\nThis is third comment.",
+			wantErr: false,
+			opts:    &Options{},
+		},
+		{
+			name: "join sentence specified number of blank line when many line comment has many blank line in between",
+			input: `
+                    // This
+                    // is
+					// first
+                    // comment.
+					//
+					//
+                    // This
+                    // is
+					// second
+                    // comment.
+					//
+					//
+					//
+                    // This
+                    // is
+					// third
+                    // comment.
+                    `,
+			want:    "This is first comment.\n\n\n\nThis is second comment.\n\n\n\nThis is third comment.",
+			wantErr: false,
+			opts:    &Options{join: 3},
+		},
 	}
 
 	for _, tt := range tests {
