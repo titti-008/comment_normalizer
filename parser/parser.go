@@ -8,9 +8,9 @@ import (
 const (
 	// newline is the default newline character.
 	_ newline = iota
+	LF
 	CR
 	CRLF
-	LF
 )
 
 const (
@@ -21,11 +21,11 @@ const (
 )
 
 const (
-	DEFOULT_JOIN = 1
+	DEFOULT_JOIN = LF
 )
 
 type newline int
-type symbol string
+type Symbol string
 
 type Parser struct {
 	input   string
@@ -33,9 +33,9 @@ type Parser struct {
 }
 
 type Options struct {
-	newline newline
-	symbol  symbol
-	join    int
+	Newline newline
+	Symbol  Symbol
+	Join    newline
 }
 
 func (n newline) String() string {
@@ -52,11 +52,11 @@ func (n newline) String() string {
 }
 
 func New(input string, opts *Options) *Parser {
-	if opts.symbol == "" {
-		opts.symbol = SYMBOL_DEFAULT
+	if opts.Symbol == "" {
+		opts.Symbol = SYMBOL_DEFAULT
 	}
-	if opts.join == 0 {
-		opts.join = DEFOULT_JOIN
+	if opts.Join == 0 {
+		opts.Join = DEFOULT_JOIN
 	}
 	return &Parser{
 		input:   input,
@@ -74,11 +74,11 @@ func (p *Parser) Parse() (string, error) {
 }
 
 func (p *Parser) trimLeadingSpacesTabs(input string) string {
-	lines := strings.Split(input, p.options.newline.String())
+	lines := strings.Split(input, p.options.Newline.String())
 	result := ""
 	for _, line := range lines {
 		line = strings.TrimLeftFunc(line, isSpaceOrTab)
-		result += line + p.options.newline.String()
+		result += line + p.options.Newline.String()
 	}
 
 	return result
@@ -89,11 +89,11 @@ func isSpaceOrTab(r rune) bool {
 }
 
 func (p *Parser) replaceCommentSymbol(input string) string {
-	return strings.Replace(input, string(p.options.symbol), "", -1)
+	return strings.Replace(input, string(p.options.Symbol), "", -1)
 }
 
 func (p *Parser) replaceNewLine(input string) string {
-	lines := strings.Split(input, p.options.newline.String())
+	lines := strings.Split(input, p.options.Newline.String())
 
 	result := []string{}
 	sentence := []string{}
@@ -116,9 +116,9 @@ func (p *Parser) replaceNewLine(input string) string {
 }
 
 func (p *Parser) emptyLine() string {
-	result := p.options.newline.String()
-	for i := 0; i < p.options.join; i++ {
-		result += p.options.newline.String()
+	result := p.options.Newline.String()
+	for i := 0; i < int(p.options.Join); i++ {
+		result += p.options.Newline.String()
 	}
 	return result
 }

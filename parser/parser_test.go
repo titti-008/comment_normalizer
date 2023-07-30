@@ -24,7 +24,7 @@ func TestParse(t *testing.T) {
 			input:   `# one line ruby comment.`,
 			want:    "one line ruby comment.",
 			wantErr: false,
-			opts:    &Options{symbol: SYMBOL_HASH},
+			opts:    &Options{Symbol: SYMBOL_HASH},
 		},
 		{
 			name: "Separated single line comment with hash symbol",
@@ -36,7 +36,7 @@ func TestParse(t *testing.T) {
 					`,
 			want:    `This is a comment.`,
 			wantErr: false,
-			opts:    &Options{symbol: SYMBOL_HASH},
+			opts:    &Options{Symbol: SYMBOL_HASH},
 		},
 		{
 			name: "Separated single line comment with slash symbol",
@@ -48,21 +48,21 @@ func TestParse(t *testing.T) {
 					`,
 			want:    `This is a comment.`,
 			wantErr: false,
-			opts:    &Options{symbol: SYMBOL_SLASH},
+			opts:    &Options{Symbol: SYMBOL_SLASH},
 		},
 		{
 			name:    "Separated by CRLF",
 			input:   "\r\n// This\r\n// is\r\n// a\r\n// comment.\r\n",
 			want:    `This is a comment.`,
 			wantErr: false,
-			opts:    &Options{newline: CRLF},
+			opts:    &Options{Newline: CRLF},
 		},
 		{
 			name:    "Separated by CR",
 			input:   "\r// This\r// is\r// a\r// comment.\r",
 			want:    `This is a comment.`,
 			wantErr: false,
-			opts:    &Options{newline: CR},
+			opts:    &Options{Newline: CR},
 		},
 		{
 			name: "many tab in front of comment",
@@ -93,7 +93,7 @@ func TestParse(t *testing.T) {
 			input:   "\t\t\t# This\r\n\t\t\t# is\r\n\t\t\t# a\r\n\t\t\t# comment.\r\n",
 			want:    `This is a comment.`,
 			wantErr: false,
-			opts:    &Options{newline: CRLF, symbol: SYMBOL_HASH},
+			opts:    &Options{Newline: CRLF, Symbol: SYMBOL_HASH},
 		},
 		{
 			name: "many line comment has blank line in between",
@@ -143,7 +143,7 @@ func TestParse(t *testing.T) {
 			opts:    &Options{},
 		},
 		{
-			name: "join sentence specified number of blank line when many line comment has many blank line in between",
+			name: "Join sentence specified number of blank line when many line comment has many blank line in between",
 			input: `
                     // This
                     // is
@@ -165,15 +165,17 @@ func TestParse(t *testing.T) {
                     `,
 			want:    "This is first comment.\n\n\n\nThis is second comment.\n\n\n\nThis is third comment.",
 			wantErr: false,
-			opts:    &Options{join: 3},
+			opts:    &Options{Join: 3},
 		},
 		{
-			name:    "join sentence specified number of blank line when many line comment has many blank line in between with CRLF",
+			name:    "Join sentence specified number of blank line when many line comment has many blank line in between with CRLF",
 			input:   " \t  // This\r\n// is\r\n// first\r\n// comment.\r\n\r\nAnd second line.",
 			want:    "This is first comment.\r\n\r\nAnd second line.",
 			wantErr: false,
-			opts:    &Options{join: 1, newline: CRLF},
+			opts:    &Options{Join: 1, Newline: CRLF},
 		},
+
+		// TODO: コメント以外の行を無視する
 	}
 
 	for _, tt := range tests {
